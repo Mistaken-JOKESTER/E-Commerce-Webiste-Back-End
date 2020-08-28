@@ -71,8 +71,8 @@ const buyerSchema = new mongoose.Schema({
         type:Buffer
     },
     cart:[{
-        productId: ObjectId,
-        productCount: {type: Number, default: 1}
+        ID: {type: String},
+        count:Number
     }],
     cartCount:{
         type:Number,

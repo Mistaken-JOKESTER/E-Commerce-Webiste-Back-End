@@ -6,7 +6,7 @@ const router = express.Router()
 router.get('/', async (req, res) => {
     try{
         const products = await Product.marketPlace()
-        res.send({products, message:'For more poducts search by category'})
+        res.send({productData:products, message:'For more poducts search by category'})
     } catch(e) {
         console.log(e)
         res.status(500).send({error: e, message:'Something Went wrong or there is no product to buy'})

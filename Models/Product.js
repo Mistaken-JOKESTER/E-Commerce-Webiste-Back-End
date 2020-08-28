@@ -61,19 +61,20 @@ productSchema.methods.updateProduct = async function(body){
     return product
 }
 
-productSchema.statics.marketPlace = () => {
-    let products = []
-    const categories = ['Clothing', 'AutoMobile', 'Electronics', 'Etables', 'Sports']
-        
-        categories.forEach( async category => {
-            let product = await Product.findOne({category})
-            if(product){
-                console.log(product.name)
-                products.push({product})
-            } 
-        })
-    
-    return products
+productSchema.statics.marketPlace = async () => {
+	let products = []
+	const categories = ['Clothing', 'AutoMobile', 'Electronics', 'Etables', 'Sports']
+
+	for (let i = 0; i < categories.length; i++) {
+		let product = await Product.findOne({ category: categories[i] })
+		// console.log(product)
+		if (product) {
+			console.log(product.name)
+			products.push(product)
+		}
+	}
+
+	return products
 }
 
 

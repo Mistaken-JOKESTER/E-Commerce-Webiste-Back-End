@@ -7,6 +7,7 @@ const cors = require('cors')
 
 const PORT = process.env.PORT || 3000
 
+//mongodb+srv://ankittaskapp:1998@cluster0.gs7gu.mongodb.net/shoping?retryWrites=true&w=majority
 mongoose.connect('mongodb://127.0.0.1:27017/Ecommerce', {
     useNewUrlParser: true,
     useUnifiedTopology: true,

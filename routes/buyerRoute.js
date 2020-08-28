@@ -87,8 +87,6 @@ router.post('/viewcart', authBuyer, async (req, res) =>{
         const products = []
         await req.buyer.cart.forEach(product =>{
             let productData = Product.findById(product)
-            delete productData._id
-            delete discription
             products.push()
         })
 
@@ -98,7 +96,7 @@ router.post('/viewcart', authBuyer, async (req, res) =>{
 
         await req.buyer.save()
 
-        res.send({cartCount: req.buyer.cartCount, products, cartValue : req.buyer.cartValue})
+        res.send({cartCount: req.buyer.cartCount, productsData: products, cartValue : req.buyer.cartValue})
     } catch(e) {
         res.status(500).send({error:e, message:'unsuccessfull'})
     }
@@ -106,19 +104,21 @@ router.post('/viewcart', authBuyer, async (req, res) =>{
 
 router.post('/addToCart',authBuyer, async (req, res) =>{
     try{
-        const productIndex = req.buyer.cart.indexOf(product => product.productId === req.body.product.ID)
-
+        console.log(req.body.product.ID)
+        const productIndex = req.buyer.cart.findIndex((product) => {return product.ID == req.body.product.ID})
+        console.log(productIndex)
         if(productIndex != -1){
-            req.buyer.cart[productIndex].productCount += req.body.product.productCount
+            req.buyer.cart[productIndex].count = Number(req.buyer.cart[productIndex].count) + Number(req.body.product.count)
         } else {
+            //console.log(req.buyer.cart[0]._id)
             req.buyer.cart.push(req.body.product)
             req.buyer.cartCount++
         }
 
-        req.buyer.cartValue += (req.body.product.price * req.body.product.productCount)
         await req.buyer.save()
         res.send({message:'successful'})
     } catch (e) {
+        console.log(e)
         res.status(500).send({error:e, message:'unsuccessful'})
     }
 })
@@ -126,13 +126,13 @@ router.post('/addToCart',authBuyer, async (req, res) =>{
 router.post('/removeFromCart', authBuyer, async (req, res) => {
     try{
         const cartCount = req.buyer.cartCount - 1
-        const { price } = Product.findById(req.body.productId)
-        req.buyer.cartValue -= price
+        const { price } = Product.findById(req.body.product.ID)
+        req.buyer.cartValue -= Number(price)
         await Buyer.updateOne(
             {
                 _id:req.id
             },{   
-                $pull: {cart: {productId : req.body.productId}},
+                $pull: {cart: {ID : req.body.product.ID}},
                 $set: {cartCount: cartCount}
             })
         
