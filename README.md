@@ -1,6 +1,9 @@
 # E-Commerce-Webiste-Back-End
 Complete back-end with Buyer, Seller and Market Place for building E-commerce website
 
+There is nothing in front end folder don't waste time looking it
+
+
 Buyer Routes 
   /buyer/register
   /buyer/login
