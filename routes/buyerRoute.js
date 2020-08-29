@@ -82,22 +82,24 @@ router.delete('/delete', authBuyer, async (req, res) =>{
     }
 })
 
-router.post('/viewcart', authBuyer, async (req, res) =>{
+router.get('/viewcart', authBuyer, async (req, res) =>{
     try{
+        req.buyer.cartValue = 0
         const products = []
-        await req.buyer.cart.forEach(product =>{
-            let productData = Product.findById(product)
-            products.push()
-        })
-
-        await products.forEach(product => {
-            req.buyer.cartValue += product.price
-        })
+        for(const x in req.buyer.cart){
+          let product = await Product.findById(req.buyer.cart[x].ID)
+          if(product){
+            product.count = req.buyer.cart[x].count
+            products.push({product, count: req.buyer.cart[x].count})
+            req.buyer.cartValue = req.buyer.cartValue + Number(product.price) * Number(req.buyer.cart[x].count)
+          }
+        }
 
         await req.buyer.save()
 
         res.send({cartCount: req.buyer.cartCount, productsData: products, cartValue : req.buyer.cartValue})
     } catch(e) {
+        console.log(e)
         res.status(500).send({error:e, message:'unsuccessfull'})
     }
 })
@@ -110,9 +112,8 @@ router.post('/addToCart',authBuyer, async (req, res) =>{
         if(productIndex != -1){
             req.buyer.cart[productIndex].count = Number(req.buyer.cart[productIndex].count) + Number(req.body.product.count)
         } else {
-            //console.log(req.buyer.cart[0]._id)
             req.buyer.cart.push(req.body.product)
-            req.buyer.cartCount++
+            req.buyer.cartCount = Number(req.buyer.cartCount) + 1
         }
 
         await req.buyer.save()
@@ -127,7 +128,6 @@ router.post('/removeFromCart', authBuyer, async (req, res) => {
     try{
         const cartCount = req.buyer.cartCount - 1
         const { price } = Product.findById(req.body.product.ID)
-        req.buyer.cartValue -= Number(price)
         await Buyer.updateOne(
             {
                 _id:req.id
@@ -141,7 +141,7 @@ router.post('/removeFromCart', authBuyer, async (req, res) => {
         res.status(500).send({error:e})
     }
 })
-router.post('/emptyCart', authBuyer, async (req,res) =>{
+router.get('/emptyCart', authBuyer, async (req,res) =>{
     try{
         req.buyer.cart = []
         req.buyer.cartCount = 0
@@ -153,7 +153,7 @@ router.post('/emptyCart', authBuyer, async (req,res) =>{
     }
 })
 
-router.post('/checkout', authBuyer, async (req, res) => {
+router.get('/checkout', authBuyer, async (req, res) => {
     try{
         const cartValue = req.buyer.cartValue
         req.buyer.cart = []
