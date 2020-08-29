@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start":"node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon app.js"
+    "dev": "./node_modules/.bin/env-cmd -f ./config/dev.env  nodemon app.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "validator": "^13.1.1"
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "nodemon": "^2.0.4"
   }
 }

@@ -5,10 +5,7 @@ const seller = require('./routes/sellerRoute')
 const marketPlace = require('./routes/marketPlace')
 const cors = require('cors')
 
-const PORT = process.env.PORT || 3000
-
-//mongodb+srv://ankittaskapp:1998@cluster0.gs7gu.mongodb.net/shoping?retryWrites=true&w=majority
-mongoose.connect('mongodb://127.0.0.1:27017/Ecommerce', {
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -27,4 +24,4 @@ app.get('/', (req, res) => {
     res.send({msg:"hello how are you"})
 })
 
-app.listen(PORT, console.log('Port is up on 3000'))
+app.listen(process.env.PORT, console.log('Port is up on 3000'))

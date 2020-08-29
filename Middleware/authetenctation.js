@@ -5,7 +5,7 @@ const Seller = require('../Models/Seller')
 const authBuyer = async (req, res, next) =>{
     try {
         const token = req.headers['auth']
-        const decode = jwt.verify(token, 'Secrete is here')
+        const decode = jwt.verify(token, process.env.JWT_SECRETE)
         const buyer = await Buyer.findOne({_id:decode.id})
 
         if(!buyer){
@@ -33,7 +33,7 @@ const authBuyer = async (req, res, next) =>{
 const authSeller = async (req, res, next) =>{
     try {
         const token = req.headers['auth']
-        const decode = jwt.verify(token, 'Secrete is here')
+        const decode = jwt.verify(token, process.env.JWT_SECRETE)
         const seller = await Seller.findOne({_id:decode.id})
 
         if(!seller){
