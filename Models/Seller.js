@@ -10,7 +10,7 @@ const sellerSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        required: true,
+        required: [true, 'we require you first name'],
         // validate(value){
         //     if(!validator.isAplha(value)){
         //         throw new Error('Name should only contain Alphabets')
@@ -21,7 +21,7 @@ const sellerSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        required: true,
+        required: [true, 'we also need second name'],
         // validate(value){
         //     if(!validator.isAplha(value)){
         //         throw new Error('Name should only contain Alphabets')
@@ -32,7 +32,7 @@ const sellerSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        required: true,
+        required: [true, 'Please gives shop name'],
         // validate(value){
         //     if(!validator.isAplha(value)){
         //         throw new Error('Name should only contain Alphabets')
@@ -52,21 +52,21 @@ const sellerSchema = new mongoose.Schema({
         }
     },
     phNumber:{
-        type: Number,
-        minlength:10,
-        maxlength:10,
-        required:true,
+        type: String,
+        minlength:[10, 'its too short'],
+        maxlength:[10, 'its too long'],
+        required:[true, 'We need your number'],
         trim:true
     },
     shopAddress:{
         type:String,
         trim: true,
         lowercase: true,
-        required: true
+        required: [true, 'where is your shop']
     },
     city:{
         type: String,
-        required:true
+        required:[true, 'We also need that']
     },
     state:{
         type:String,

@@ -5,6 +5,7 @@ const seller = require('./routes/sellerRoute')
 const marketPlace = require('./routes/marketPlace')
 const cors = require('cors')
 
+
 mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -19,9 +20,5 @@ app.use(express.json())
 app.use('/buyer', buyer)
 app.use('/seller', seller)
 app.use('/marketPlace', marketPlace)
-
-app.get('/', (req, res) => {
-    res.send({msg:"hello how are you"})
-})
 
 app.listen(process.env.PORT, console.log('Port is up on 3000'))

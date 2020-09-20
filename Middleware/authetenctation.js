@@ -10,14 +10,14 @@ const authBuyer = async (req, res, next) =>{
 
         if(!buyer){
             console.log("buyer not found")
-            throw new Error()
+            return res.send({error:'error'})
         }
 
         const tokenExesist = buyer.tokens.includes(token);
 
         if(!tokenExesist){
             console.log('token not found')
-            throw new Error()
+            return res.send({error:'error'})
         }
         req.token = token
         req.buyer = buyer
@@ -34,24 +34,27 @@ const authSeller = async (req, res, next) =>{
     try {
         const token = req.headers['auth']
         const decode = jwt.verify(token, process.env.JWT_SECRETE)
-        const seller = await Seller.findOne({_id:decode.id})
+        const seller = await Seller.findById(decode.id)
 
         if(!seller){
-            throw new Error()
+            console.log("seller not found")
+            return res.send({error:'error'})
         }
 
         const tokenExesist = seller.tokens.includes(token.toString());
 
         if(!tokenExesist){  
-            throw new Error()
+            console.log('token not found')
+            return res.send({error:'error'})
         }
 
-        req.token = token
         req.seller = seller
+        req.seller.tokens=token
         req.id = decode.id
         next()
     } catch (e){
-        res.status(500).send({error:'Please login again', message:'unsuccessful'})
+        console.log(e)
+        res.send({error:'Please login again', message:'unsuccessful'})
     }
         
 }

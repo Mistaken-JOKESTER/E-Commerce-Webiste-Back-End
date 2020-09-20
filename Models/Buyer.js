@@ -9,7 +9,7 @@ const buyerSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        required: true
+        required: [true, 'What is you first name']
         // validate(value){
         //     if(!validator.isAlphanumeric(value)){
         //         throw new Error('Name should only contain Alphabets')
@@ -20,7 +20,7 @@ const buyerSchema = new mongoose.Schema({
         type: String,
         trim: true,
         lowercase: true,
-        required: true
+        required: [true, 'We also need second name']
         // validate(value){
         //     if(!validator.isAlphanumeric(value)){
         //         throw new Error('Name should only contain Alphabets')
@@ -33,28 +33,28 @@ const buyerSchema = new mongoose.Schema({
         unique: true,
         lowercase:true,
         required: true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new Error('Please enter a valid Email')
-            }
-        }
     },
     phNumber:{
-        type: Number,
-        minlength:10,
-        maxlength:10,
+        type: String,
+        minlength:[10, 'phone number is two short'],
+        maxlength:[10, 'phone number is too large'],
         required:true,
-        trim:true
+        trim:true,
+        validate(value){
+                 if(!validator.isNumeric(value)){
+                     throw new Error('Phone no should only contain numbers')
+                 }
+             }
     },
     address:{
         type:String,
         trim: true,
         lowercase: true,
-        required: true
+        required: [true, 'Where we will deliver your product']
     },
     city:{
         type: String,
-        required:true
+        required:[true, 'Please provide the name city']
     },
     state:{
         type:String,
@@ -68,11 +68,11 @@ const buyerSchema = new mongoose.Schema({
     },
     tokens:[String],
     avatar:{
-        type:Buffer
+        type:String
     },
     cart:[{
         ID: {type: String},
-        count:Number
+        count:{type:Number, default: 1}
     }],
     cartCount:{
         type:Number,
@@ -95,7 +95,7 @@ buyerSchema.pre('save', async function(next){
     next()
 })
 
-buyerSchema.methods.updateBuyer = function(body){
+buyerSchema.methods.updateBuyer = async function(body){
     const validUpdates = ['firstName', 'secondName', 'email','phNumber','address','city','state','password','avatar']
     const updates = Object.keys(body)
     const updatePossible = updates.every(update => validUpdates.includes(update))
@@ -106,7 +106,7 @@ buyerSchema.methods.updateBuyer = function(body){
 
     const buyer = this 
     updates.forEach(update => buyer[update] = body[update])
-    buyer.save()
+    await buyer.save()
     return buyer
 }
 
@@ -114,11 +114,11 @@ buyerSchema.statics.findByCredentials= async (email, password) => {
     const buyer = await Buyer.findOne({email})
 
     if(!buyer){
-        throw new Error('Unable to login')
+        throw new Error()
     }
     const compare = await bcrypt.compare(password, buyer.password)
     if(!compare){
-        throw new Error('Unable to login')
+        throw new Error()
     }
 
     return buyer

@@ -66,13 +66,34 @@ productSchema.statics.marketPlace = async () => {
 	const categories = ['Clothing', 'AutoMobile', 'Electronics', 'Etables', 'Sports']
 
 	for (let i = 0; i < categories.length; i++) {
-		let product = await Product.findOne({ category: categories[i] })
-		// console.log(product)
+        const product = await Product.findOne({ category: categories[i] })
+        
 		if (product) {
-			console.log(product.name)
-			products.push(product)
+            
+			products.push({
+                name: product.name,
+                category: product.category,
+                price: product.price,
+                stock:product.stock,
+                _id:product._id,
+                productAvatar:product.productAvatar
+            })
 		}
 	}
+
+	return products
+}
+
+productSchema.statics.byCategory = async (category) => {
+	const products = await Product.find({category},{
+        discription: 0,
+        specs: 0,
+        owner: 0, 
+    })
+
+    if(!products.length){
+        return {error:{message:'there is no product in this category'}}
+    }
 
 	return products
 }

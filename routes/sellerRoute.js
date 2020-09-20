@@ -3,30 +3,38 @@ const Seller = require('../Models/Seller')
 const { authSeller } = require('../Middleware/authetenctation')
 const { upload, imageResize } = require('../Middleware/image')
 const Product = require('../Models/Product')
+const validator = require('validator')
 
 const router = express.Router()
 
-router.post('/register', upload.single('avatar'), async (req, res) => {
+router.post('/register',upload, async (req, res) => {
     try{
-        const exesist = await Seller.findOne({email: req.body.email})
+        const obj = JSON.parse(JSON.stringify(req.body)); 
+
+        if(!validator.isEmail(obj.email)){
+            return res.send({error: {message:'email is invalid'} })
+        }
+        const exesist = await Seller.findOne({email: obj.email})
         if(exesist){
-            return res.status(400).send({error: 'email is invalid', message:'unsuccessful'})
+            return res.send({error: {message:'email is invalid'} })
         }
-        if(req.body.password.length < 8){
-            return res.send(400).send({error: 'password is two short', message:'unsuccessful'})
+        if(obj.password.length < 8){
+            return res.send({error: {message:'password must have atleast 8 letters'}})
+        }
+        if(req.errorMessage){
+            return res.send({error:{message: req.errorMessage}})
         }
 
-        if(req.file){
-            req.body.avatar = imageResize(req.file.buffer, 200, 200).toString('base64')
-        }
+        obj.avatar = req.file.buffer.toString('base64')
 
-        const seller = new Seller(req.body)
+        const seller = new Seller(obj)
         await seller.save()
-        res.send({message: 'successful'})
+        const name = obj.firstName + " " + obj.secondName
+        res.send({name})
     }
     catch(e) {
         console.log(e)
-        res.status(500).send({message:'unsuccessful', e})
+        res.send({message:'unsuccessful', error: e})
     }
 })
 
@@ -37,28 +45,37 @@ router.post('/login', async (req, res) => {
         res.send({message:'succesfull', token: token})
     } catch (e){
         console.log(e)
-        res.status(500).send({message:'unsuccessful', error: e})
+        res.send({error: 'Please check email and passowrd'})
     }
 })
 
-router.post('/profile', authSeller, async (req, res) => {
+router.get('/welcome', authSeller, (req, res) => {
+    try{
+        name = req.seller.firstName + ' ' + req.seller.secondName
+        res.send({name})
+    } catch (e) {
+        res.send({error: "error"})
+    }
+})
+
+router.get('/profile', authSeller, async (req, res) => {
     try{
         res.send({profile: req.seller})
-
     } catch (e) {
         res.status(500).send({error: e, message:'Something Wrong has happened'})
     }
 })
 
-router.post('/update', authSeller, upload.single('avatar'),  async (req, res) => {
+router.post('/update', authSeller, upload,  async (req, res) => {
     try{
         if(req.file){
-            req.body.avatar = imageResize(req.file.buffer, 200, 200).toString('base64')
+            req.body.avatar = req.file.buffer.toString('base64')
         }
 
         const seller= await req.seller.updateSeller(req.body)
         res.send({message:'Your Profile is updated', seller})
     } catch(e) {
+        console.log(e)
         res.status(500).send({error:e})
     }
 })
@@ -113,7 +130,7 @@ router.post('/updateProduct', authSeller, async (req, res) => {
     }
 })
 
-router.post('/addProduct', authSeller, upload.single('productAvatar'), async (req, res) => {
+router.post('/addProduct', authSeller, async (req, res) => {
     try{
         req.body.product.owner = req.seller._id
         if(req.file){
