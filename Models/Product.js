@@ -30,10 +30,6 @@ const productSchema = new mongoose.Schema({
         lowercase:true,
         required: true
     },
-    specs:[{
-        type: Map,
-        of: String
-    }],
     productAvatar: {
         type:String,
         //required:true

@@ -103,7 +103,6 @@ router.delete('/delete', authSeller, async (req, res) =>{
 router.post('/viewProducts', authSeller, async (req, res) => {
     try{
         await req.seller.populate('products').execPopulate()
-        console.log(req.seller.products)
         res.send({products: req.seller.products})
     } catch(e) {
         res.status(500).send({error:e, message:'unsuccessfull'})
@@ -130,29 +129,33 @@ router.post('/updateProduct', authSeller, async (req, res) => {
     }
 })
 
-router.post('/addProduct', authSeller, async (req, res) => {
+router.post('/addProduct', authSeller, upload, async (req, res) => {
     try{
-        req.body.product.owner = req.seller._id
+        const obj = JSON.parse(JSON.stringify(req.body));
+        
+        obj.owner = req.seller._id
         if(req.file){
-            req.body.product.productAvatar = imageResize(req.file.buffer, 400, 400).toString('base64')
+            obj.productAvatar = req.file.buffer.toString('base64')
         }
         
-        const product = new Product(req.body.product)
+        const product = new Product(obj)
         await product.save()
         req.seller = await req.seller.toJson()
         res.send({product, seller: req.seller})
     }catch(e){
-        res.status(500).send({error: e, message:'Something went wrong please try again'})
+        // console.log(e)
+        res.send({error: e, message:'Something went wrong please try again'})
     }
 })
 
 router.post('/removeProduct', authSeller, async (req, res) => {
     try{
-        const product = await Product.deleteOne({_id: req.query.productID})
+        const product = await Product.deleteOne({_id: req.body.productID})
+        console.log(product)
         res.send({ message:'product is removed from marketplace'})
     } catch(e) {
         console.log(e)
-        res.status(500).send({error: e, message:'Something went wrong please try again'})
+        res.send({error: e, message:'Something went wrong please try again'})
     }
 })
 
