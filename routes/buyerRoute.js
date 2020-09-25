@@ -9,7 +9,6 @@ const validator = require('validator')
 router.post('/register', upload,  async (req, res) => {
     try{
         const obj = JSON.parse(JSON.stringify(req.body)); 
-        console.log(obj)
 
         if(!validator.isEmail(obj.email)){
             return res.send({error: {message:'email is invalid'} })
@@ -35,7 +34,6 @@ router.post('/register', upload,  async (req, res) => {
         res.send({name})
     }
     catch(e) {
-        console.log(e)
         res.send({message:'unsuccessful', error: e})
     }
 })
@@ -83,8 +81,6 @@ router.post('/update', authBuyer, upload, async (req, res) => {
         const buyer = await req.buyer.updateBuyer(obj)
         res.send({message:'Your Profile is updated and now you shop again'})
     } catch(e) {
-        console.log('error occured')
-        console.log(e)
         res.send({error:{message: "please check information you filled or refresh and try again"}})
     }
 })
@@ -131,16 +127,15 @@ router.get('/viewcart', authBuyer, async (req, res) =>{
 
         res.send({cartCount: req.buyer.cartCount, productsData: products, cartValue : req.buyer.cartValue})
     } catch(e) {
-        console.log(e)
         res.status(500).send({error:e, message:'unsuccessfull'})
     }
 })
 
 router.post('/addToCart',authBuyer, async (req, res) =>{
     try{
-        console.log(req.body)
+        
         const productIndex = req.buyer.cart.findIndex((product) => {return product.ID == req.body.product.ID})
-        console.log(productIndex)
+    
         if(productIndex != -1){
             req.buyer.cart[productIndex].count = Number(req.buyer.cart[productIndex].count) + req.body.product.count
         } else {
@@ -151,7 +146,7 @@ router.post('/addToCart',authBuyer, async (req, res) =>{
         await req.buyer.save()
         res.send({message:'successful', cartCount:req.buyer.cartCount})
     } catch (e) {
-        console.log(e)
+        
         res.send({error:{ message:'Unable to add to Cart Try agian'}})
     }
 })
@@ -204,12 +199,12 @@ router.get('/checkout', authBuyer, async (req, res) => {
 router.post('/directbuy', authBuyer, async (req, res) => {
     try{
         const product = await Product.findById(req.body.product.ID)
-        console.log(product.price, req.body)
+        
         const price = product.price * req.body.product.count
-        console.log(price)
+        
         res.send({message:`Your ${product.name} will be delivered at ${req.buyer.address} ${req.buyer.city} and you have to pay $${price.toString()}`})
     } catch(e) {
-        console.log(e)
+        
         res.send({error:{message:'something went wrong Please try again'}})
     }
 })

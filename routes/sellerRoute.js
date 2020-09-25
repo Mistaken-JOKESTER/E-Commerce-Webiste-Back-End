@@ -33,7 +33,7 @@ router.post('/register',upload, async (req, res) => {
         res.send({name})
     }
     catch(e) {
-        console.log(e)
+        
         res.send({message:'unsuccessful', error: e})
     }
 })
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
         const token = await seller.generateToken()
         res.send({message:'succesfull', token: token})
     } catch (e){
-        console.log(e)
+        
         res.send({error: 'Please check email and passowrd'})
     }
 })
@@ -75,7 +75,7 @@ router.post('/update', authSeller, upload,  async (req, res) => {
         const seller= await req.seller.updateSeller(req.body)
         res.send({message:'Your Profile is updated', seller})
     } catch(e) {
-        console.log(e)
+        
         res.status(500).send({error:e})
     }
 })
@@ -124,7 +124,7 @@ router.post('/updateProduct', authSeller, async (req, res) => {
         product = await product.updateProduct(req.body)
         res.send({product, message:'Product has been updated succesfully'})
     } catch(e) {
-        console.log(e)
+        
         res.send({message:'something went Wrong', error: e})
     }
 })
@@ -143,7 +143,7 @@ router.post('/addProduct', authSeller, upload, async (req, res) => {
         req.seller = await req.seller.toJson()
         res.send({product, seller: req.seller})
     }catch(e){
-        // console.log(e)
+        
         res.send({error: e, message:'Something went wrong please try again'})
     }
 })
@@ -151,10 +151,10 @@ router.post('/addProduct', authSeller, upload, async (req, res) => {
 router.post('/removeProduct', authSeller, async (req, res) => {
     try{
         const product = await Product.deleteOne({_id: req.body.productID})
-        console.log(product)
+        
         res.send({ message:'product is removed from marketplace'})
     } catch(e) {
-        console.log(e)
+        
         res.send({error: e, message:'Something went wrong please try again'})
     }
 })

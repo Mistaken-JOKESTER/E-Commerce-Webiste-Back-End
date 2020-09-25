@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
         const products = await Product.marketPlace()
         res.send({productData:products, message:'For more poducts search by category'})
     } catch(e) {
-        console.log(e)
+        
         res.status(500).send({error: e, message:'Something Went wrong or there is no product to buy'})
     }
 })
@@ -18,7 +18,7 @@ router.post('/bycategory', async (req, res) => {
         const products = await Product.byCategory(req.query.category)
         res.send({productData:products})
     } catch(e){
-        console.log(e)
+        
         res.send({error:e, message:'Something went worng or this is no product in this category'})
     }
 })
